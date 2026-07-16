@@ -59,3 +59,23 @@ select,
 .nav-link{
     cursor:none;
 }
+@keyframes cursorPulse {
+
+    0%{
+        box-shadow:0 0 10px #6366f1;
+    }
+
+    50%{
+        box-shadow:0 0 30px #ec4899;
+    }
+
+    100%{
+        box-shadow:0 0 10px #6366f1;
+    }
+
+}
+
+
+.custom-cursor{
+    animation:cursorPulse 2s infinite;
+}
