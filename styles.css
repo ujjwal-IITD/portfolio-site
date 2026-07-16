@@ -81,3 +81,15 @@ select,
 .custom-cursor{
     animation:cursorPulse 2s infinite;
 }
+.cursor-hover{
+    width:18px !important;
+    height:18px !important;
+    background:#ec4899 !important;
+}
+
+
+.follower-hover{
+    width:70px !important;
+    height:70px !important;
+    border-color:#ec4899 !important;
+}
