@@ -20,71 +20,49 @@ body {
     position:relative;
 }
 
-/* Main cursor: small glowing dot, snaps instantly to the pointer */
+/* Custom cursor is a single outlined ring that inverts color via blend mode,
+   so it reads as white on dark backgrounds and black on light backgrounds
+   (matches the reference site's cursor exactly). No dot is used. */
 .custom-cursor {
-    position:fixed;
-    top:0;
-    left:0;
-    width:8px;
-    height:8px;
-    background:#fff;
-    border-radius:50%;
-    pointer-events:none;
-    z-index:99999;
-    transform:translate(-50%, -50%);
-    box-shadow:0 0 12px 2px rgba(99,102,241,.9), 0 0 24px 6px rgba(168,85,247,.5);
-    transition: width .25s cubic-bezier(.16,1,.3,1),
-                height .25s cubic-bezier(.16,1,.3,1),
-                background .25s ease,
-                box-shadow .25s ease;
-    will-change: transform;
+    display: none;
 }
 
-/* Smooth follower ring: eased trail behind the dot, softly glowing */
 .cursor-follower {
-    position:fixed;
-    top:0;
-    left:0;
-    width:36px;
-    height:36px;
-    border:1.5px solid rgba(99,102,241,.7);
-    border-radius:50%;
-    pointer-events:none;
-    z-index:99998;
-    transform:translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(99,102,241,.12) 0%, rgba(99,102,241,0) 70%);
-    box-shadow: 0 0 20px rgba(99,102,241,.25) inset;
-    transition: width .35s cubic-bezier(.16,1,.3,1),
-                height .35s cubic-bezier(.16,1,.3,1),
-                border-color .35s ease,
-                background .35s ease,
-                box-shadow .35s ease,
-                opacity .35s ease;
-    opacity:.9;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #ffffff;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: width .3s cubic-bezier(.16,1,.3,1),
+                height .3s cubic-bezier(.16,1,.3,1),
+                opacity .3s ease;
     will-change: transform;
+    opacity: 1;
 }
 
-/* Hover state: cursor shrinks into the target, ring expands to "hug" it (magnetic feel) */
-.custom-cursor.is-hovering {
-    width:6px;
-    height:6px;
-    background:#ec4899;
-    box-shadow:0 0 16px 3px rgba(236,72,153,.95), 0 0 30px 8px rgba(236,72,153,.5);
+/* Ring is hollow by default (border only) */
+.cursor-follower {
+    background: transparent;
+    border: 1.5px solid #ffffff;
 }
 
+/* Hover state: ring grows slightly to signal interactivity */
 .cursor-follower.is-hovering {
-    width:64px;
-    height:64px;
-    border-color:rgba(236,72,153,.85);
-    background: radial-gradient(circle, rgba(236,72,153,.15) 0%, rgba(236,72,153,0) 70%);
-    box-shadow: 0 0 30px rgba(236,72,153,.35) inset;
+    width: 68px;
+    height: 68px;
+    border-width: 1.5px;
 }
 
-/* Click feedback: quick pulse */
+/* Click feedback: quick contraction */
 .cursor-follower.is-clicking {
-    width:28px;
-    height:28px;
-    border-color:rgba(255,255,255,.9);
+    width: 34px;
+    height: 34px;
 }
 
 /* Hide the custom cursor on touch devices where it can't work */
