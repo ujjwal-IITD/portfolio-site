@@ -1,82 +1,68 @@
-:root { --primary-color: #6366f1; --secondary-color: #a855f7; --accent-color: #ec4899; --dark-bg: #191a3a; --dark-lighter: #241f4e; --text-primary: #f1f5f9; --text-secondary: #cbd5e1; } * { margin: 0; padding: 0; box-sizing: border-box; } html { scroll-behavior: smooth; } body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--dark-bg); color: var(--text-primary); overflow-x: hidden; line-height: 1.6; } .animated-bg {
-    position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-    background: linear-gradient(135deg,#1a1b3a 0%,#2d1b4e 50%,#1a1b3a 100%);
-    overflow:hidden;
-}
+const cursorFollower = document.querySelector(".cursor-follower");
 
-.navbar,
-.hero,
-.scroll-indicator {
-    position: relative;
-    z-index: 2;
-}.bg-orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.45; animation: float 15s ease-in-out infinite; } .bg-orb-1 { width: 400px; height: 400px; background: linear-gradient(135deg, #6366f1, #a855f7); top: -50px; right: -50px; } .bg-orb-2 { width: 300px; height: 300px; background: linear-gradient(135deg, #ec4899, #f43f5e); bottom: 50px; left: 10%; animation-delay: 5s; } .bg-orb-3 { width: 350px; height: 350px; background: linear-gradient(135deg, #14b8a6, #06b6d4); bottom: -50px; right: 10%; animation-delay: 10s; } @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, -30px); } } /* Hide default cursor */
-body {
-    cursor:none;
-    position:relative;
-}
+// Only run the custom cursor experience on devices with a real pointer (mouse/trackpad)
+const hasFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-/* Custom cursor is a single outlined ring that inverts color via blend mode,
-   so it reads as white on dark backgrounds and black on light backgrounds
-   (matches the reference site's cursor exactly). No dot is used. */
-.custom-cursor {
-    display: none;
-}
+if (cursorFollower && hasFinePointer) {
 
-.cursor-follower {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: #ffffff;
-    pointer-events: none;
-    z-index: 99999;
-    transform: translate(-50%, -50%);
-    mix-blend-mode: difference;
-    transition: width .3s cubic-bezier(.16,1,.3,1),
-                height .3s cubic-bezier(.16,1,.3,1),
-                opacity .3s ease;
-    will-change: transform;
-    opacity: 1;
-}
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
 
-/* Ring is hollow by default (border only) */
-.cursor-follower {
-    background: transparent;
-    border: 1.5px solid #ffffff;
-}
+    // Ring position, eased toward the real pointer position each frame
+    let ringX = mouseX;
+    let ringY = mouseY;
 
-/* Hover state: ring grows slightly to signal interactivity */
-.cursor-follower.is-hovering {
-    width: 68px;
-    height: 68px;
-    border-width: 1.5px;
-}
+    document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
 
-/* Click feedback: quick contraction */
-.cursor-follower.is-clicking {
-    width: 34px;
-    height: 34px;
-}
+    function animateCursor() {
+        // Smooth easing creates the trailing/lag feel of the reference cursor
+        ringX += (mouseX - ringX) * 0.18;
+        ringY += (mouseY - ringY) * 0.18;
 
-/* Hide the custom cursor on touch devices where it can't work */
-@media (hover: none), (pointer: coarse) {
-    .custom-cursor, .cursor-follower { display:none; }
-    body { cursor:auto; }
-    a, button, input, textarea, select, .card, .btn, .nav-link { cursor:pointer; }
-} .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 80px; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(51, 65, 85, 0.2); z-index: 1000; display: flex; align-items: center; padding: 0 40px; } .nav-container { max-width: 1400px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; } .logo-text { display: flex; gap: 2px; font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; } .letter { display: inline-block; animation: letterFloat 3s ease-in-out infinite; } @keyframes letterFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } } .nav-menu { display: flex; gap: 40px; align-items: center; } .nav-link { color: var(--text-secondary); text-decoration: none; font-weight: 500; position: relative; transition: all 0.3s ease; } .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); transition: width 0.3s ease; } .nav-link:hover, .nav-link.active { color: var(--primary-color); } .nav-link:hover::after, .nav-link.active::after { width: 100%; } .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 80px 40px 40px; max-width: 1400px; margin: 0 auto; position: relative; } .hero-content { flex: 1; } .hero-title { font-size: 72px; font-weight: 900; line-height: 1.1; margin-bottom: 20px; background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; } .name-text { display: flex; flex-wrap: wrap; gap: 10px; } .char { display: inline-block; animation: charBounce 0.6s ease-out backwards; } @keyframes charBounce { 0% { opacity: 0; transform: translateY(50px) scale(0.3); } 50% { transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0) scale(1); } } .hero-subtitle { font-size: 28px; color: var(--text-secondary); margin-bottom: 15px; } .hero-description { font-size: 18px; color: var(--text-secondary); margin-bottom: 40px; max-width: 500px; } .cta-buttons { display: flex; gap: 20px; flex-wrap: wrap; } .btn { padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease; border: 2px solid transparent; cursor: none; } .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3); } .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5); } .btn-secondary { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); } .btn-secondary:hover { background: var(--primary-color); color: white; } .floating-cards { flex: 1; display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; } .card { width: 150px; height: 150px; background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(99, 102, 241, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; backdrop-filter: blur(10px); animation: floatCard 6s ease-in-out infinite; transition: all 0.3s ease; } .card:hover { border-color: var(--primary-color); background: rgba(99, 102, 241, 0.15); transform: scale(1.05); } .card-icon { font-size: 48px; } .card p { text-align: center; font-weight: 600; } @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } } .scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; } .scroll-indicator span { display: block; margin-bottom: 15px; color: var(--text-secondary); font-size: 14px; } .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; } .section-title { font-size: 56px; font-weight: 900; text-align: center; margin-bottom: 60px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; } .about-section, .education-section, .experience-section, .publications-section, .conferences-section, .contact-section { min-height: 100vh; padding: 100px 40px; display: flex; align-items: center; } .about-content { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; } .about-text p { font-size: 18px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.8; } .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; } .skill-card { background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(99, 102, 241, 0.2); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); transition: all 0.3s ease; } .skill-card:hover { border-color: var(--secondary-color); background: rgba(168, 85, 247, 0.15); transform: translateY(-10px); } .skill-card h3 { color: var(--primary-color); margin-bottom: 15px; } .skill-card ul { list-style: none; } .skill-card li { color: var(--text-secondary); padding: 8px 0; } .timeline { position: relative; padding: 20px 0; } .timeline::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 2px; height: 100%; background: linear-gradient(180deg, var(--primary-color), var(--secondary-color), transparent); } .timeline-item { margin-bottom: 50px; position: relative; } .timeline-marker { position: absolute; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: var(--primary-color); border: 4px solid var(--dark-bg); border-radius: 50%; top: 0; } .timeline-content { width: calc(50% - 30px); background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(99, 102, 241, 0.2); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); transition: all 0.3s ease; } .timeline-item:nth-child(odd) .timeline-content { margin-left: 0; margin-right: auto; } .timeline-item:nth-child(even) .timeline-content { margin-left: auto; margin-right: 0; } .timeline-content:hover { border-color: var(--secondary-color); background: rgba(168, 85, 247, 0.15); } .timeline-content h3 { color: var(--primary-color); margin-bottom: 10px; } .institution, .company { font-weight: 600; color: var(--secondary-color); } .publications-grid, .conferences-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; } .publication-card, .conference-card { background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(99, 102, 241, 0.2); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); transition: all 0.3s ease; } .publication-card:hover, .conference-card:hover { border-color: var(--secondary-color); background: rgba(168, 85, 247, 0.15); transform: translateY(-10px); } .pub-date, .conf-status { background: rgba(99, 102, 241, 0.2); color: var(--primary-color); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; } .contact-content { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 80px; } .contact-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; } .contact-card { background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(99, 102, 241, 0.2); border-radius: 15px; padding: 25px; backdrop-filter: blur(10px); text-align: center; transition: all 0.3s ease; } .contact-card:hover { border-color: var(--secondary-color); background: rgba(168, 85, 247, 0.15); transform: translateY(-10px); } .contact-icon { font-size: 40px; margin-bottom: 15px; } .contact-form { display: flex; flex-direction: column; gap: 20px; } .form-group { display: flex; flex-direction: column; gap: 10px; } .form-group label { color: var(--text-primary); font-weight: 600; } .form-group input, .form-group textarea { background: rgba(99, 102, 241, 0.1); border: 2px solid rgba(99, 102, 241, 0.2); border-radius: 10px; padding: 12px 16px; color: var(--text-primary); font-family: inherit; font-size: 16px; transition: all 0.3s ease; } .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--secondary-color); background: rgba(168, 85, 247, 0.15); } .form-submit { width: 100%; margin-top: 10px; } @media (max-width: 1024px) { .hero { flex-direction: column; text-align: center; } .about-content { grid-template-columns: 1fr; } .contact-content { grid-template-columns: 1fr; } .timeline::before { left: 0; } .timeline-content { width: 100%; margin-left: 0 !important; } } @media (max-width: 768px) { .nav-menu { display: none; } .hero { padding: 80px 20px 40px; } .hero-title { font-size: 36px; } .section-title { font-size: 36px; } .floating-cards { flex-direction: column; } .navbar { padding: 0 20px; } .container { padding: 0 20px; } } a,
-button,
-input,
-textarea,
-select,
-.card,
-.btn,
-.nav-link{
-    cursor:none;
-}
+        cursorFollower.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+
+        requestAnimationFrame(animateCursor);
+    }
+
+    animateCursor();
+
+    // Hover animation: any interactive element makes the ring grow
+    const hoverElements = document.querySelectorAll(
+        "a, button, .btn, .card, .nav-link, input, textarea, select"
+    );
+
+    hoverElements.forEach((item) => {
+        item.addEventListener("mouseenter", () => {
+            cursorFollower.classList.add("is-hovering");
+        });
+
+        item.addEventListener("mouseleave", () => {
+            cursorFollower.classList.remove("is-hovering");
+        });
+    });
+
+    // Click feedback: quick contraction of the ring
+    document.addEventListener("mousedown", () => {
+        cursorFollower.classList.add("is-clicking");
+    });
+    document.addEventListener("mouseup", () => {
+        cursorFollower.classList.remove("is-clicking");
+    });
+
+    // Hide the ring when the pointer leaves the window, restore on re-entry
+    document.addEventListener("mouseleave", () => {
+        cursorFollower.style.opacity = "0";
+    });
+    document.addEventListener("mouseenter", () => {
+        cursorFollower.style.opacity = "1";
+    });
+
+} else if (cursorFollower) {
+    // No fine pointer (touch device): remove the custom cursor entirely
+    cursorFollower.remove();
+    const customCursor = document.querySelector(".custom-cursor");
+    if (customCursor) customCursor.remove();
+}  function setActiveNavLink() { const currentLocation = location.pathname; const navLinks = document.querySelectorAll('.nav-link'); navLinks.forEach((link) => { const href = link.getAttribute('href'); if (currentLocation.includes(href) || (currentLocation.endsWith('/') && href === 'index.html')) { link.classList.add('active'); } else { link.classList.remove('active'); } }); } setActiveNavLink(); const contactForm = document.querySelector('.contact-form'); if (contactForm) { contactForm.addEventListener('submit', (e) => { e.preventDefault(); const submitButton = contactForm.querySelector('.form-submit'); submitButton.innerHTML = 'Message Sent! ✓'; submitButton.disabled = true; contactForm.reset(); setTimeout(() => { submitButton.innerHTML = '<span class="btn-text">Send Message</span>'; submitButton.disabled = false; }, 3000); }); } const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }; const observer = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.style.animation = 'slideInUp 0.8s ease forwards'; observer.unobserve(entry.target); } }); }, observerOptions); document.querySelectorAll('.timeline-animate, .skill-animate, .pub-animate, .conf-animate, .contact-animate').forEach((el) => { observer.observe(el); });
